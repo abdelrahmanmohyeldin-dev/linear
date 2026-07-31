@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Practice — Linear Equations in One Variable (Bluebook-Style)</title>
+<style>
+  :root{
+    --navy:#12233d;
+    --navy-2:#1c3559;
+    --blue:#0870d9;
+    --blue-dark:#065fb8;
+    --line:#d7dbe3;
+    --text:#12233d;
+    --muted:#5a6472;
+    --bg:#eef1f5;
+    --card:#ffffff;
+    --green:#1a7f4e;
+    --red:#c0362c;
+    --amber:#b9770e;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    max-width:1100px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--card);
+    box-shadow:0 0 0 1px var(--line);
+  }
+  .topbar{
+    background:var(--navy);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 20px;
+    flex-shrink:0;
+  }
+  .topbar .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.2px;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--blue);display:inline-block;}
+  .timer-wrap{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-variant-numeric:tabular-nums;
+  }
+  .timer{
+    font-size:15px;
+    font-weight:700;
+    background:rgba(255,255,255,.08);
+    padding:6px 12px;
+    border-radius:20px;
+    min-width:74px;
+    text-align:center;
+    cursor:pointer;
+    user-select:none;
+  }
+  .timer.hidden-time{color:transparent;position:relative;}
+  .timer.hidden-time::after{
+    content:"Hidden";
+    color:#cfd8e6;
+    position:absolute;left:0;right:0;text-align:center;
+  }
+  .icon-btn{
+    background:transparent;
+    border:1px solid rgba(255,255,255,.35);
+    color:#fff;
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:13px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,.12);}
+  .progressbar{height:4px;background:var(--line);flex-shrink:0;}
+  .progressbar > div{height:100%;background:var(--blue);transition:width .25s ease;}
+  .screen{flex:1;display:flex;flex-direction:column;min-height:0;}
+  .hidden{display:none !important;}
+  .start{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:60px 24px;
+    gap:22px;
+  }
+  .start h1{font-size:28px;margin:0;}
+  .start p{color:var(--muted);max-width:520px;line-height:1.6;font-size:15px;margin:0;}
+  .start .meta{
+    display:flex;gap:28px;margin-top:6px;flex-wrap:wrap;justify-content:center;
+  }
+  .meta-item{
+    background:var(--bg);border:1px solid var(--line);border-radius:10px;
+    padding:14px 20px;min-width:140px;
+  }
+  .meta-item .num{font-size:22px;font-weight:800;color:var(--navy);}
+  .meta-item .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+  .options-row{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+  .toggle-row{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);}
+  .primary-btn{
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    padding:14px 36px;
+    border-radius:26px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:8px;
+  }
+  .primary-btn:hover{background:var(--blue-dark);}
+  .primary-btn:disabled{background:#a9c2e0;cursor:not-allowed;}
+  .qmeta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 28px;
+    border-bottom:1px solid var(--line);
+  }
+  .qnum-chip{
+    display:flex;align-items:center;gap:10px;
+  }
+  .qnum-chip .badge{
+    background:var(--navy);color:#fff;font-weight:700;font-size:13px;
+    padding:5px 12px;border-radius:16px;
+  }
+  .qnum-chip .of{color:var(--muted);font-size:13px;}
+  .flag-btn{
+    display:flex;align-items:center;gap:6px;
+    background:transparent;border:1px solid var(--line);
+    border-radius:16px;padding:6px 14px;font-size:13px;cursor:pointer;
+    color:var(--text);font-family:inherit;
+  }
+  .flag-btn.active{background:#fff4e0;border-color:var(--amber);color:var(--amber);font-weight:700;}
+  .flag-btn svg{width:14px;height:14px;}
+  .qbody{
+    flex:1;
+    padding:30px 28px 10px;
+    overflow-y:auto;
+  }
+  .qcard{max-width:760px;margin:0 auto;}
+  .topic{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;font-weight:700;}
+  .prompt{
+    font-size:18px;
+    line-height:1.65;
+    margin-bottom:22px;
+  }
+  .prompt .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1;}
+  .prompt .frac .num{border-bottom:1.3px solid var(--text);padding:0 3px 1px;font-size:.92em;}
+  .prompt .frac .den{padding:1px 3px 0;font-size:.92em;}
+  .prompt i{font-style:italic;}
+  .stimulus{margin:18px 0 26px;text-align:center;}
+  .stimulus svg{max-width:100%;height:auto;}
+  .choices{display:flex;flex-direction:column;gap:12px;}
+  .choice{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    cursor:pointer;
+    transition:border-color .12s, background .12s;
+    background:#fff;
+  }
+  .choice:hover{border-color:#9fb7d9;background:#f7fafd;}
+  .choice.selected{border-color:var(--blue);background:#eaf3fd;}
+  .choice .letter{
+    flex-shrink:0;
+    width:28px;height:28px;border-radius:50%;
+    border:1.5px solid var(--muted);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;color:var(--text);
+    background:#fff;
+  }
+  .choice.selected .letter{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .choice .ctext{padding-top:3px;font-size:16px;line-height:1.5;}
+  .spr-wrap{max-width:320px;}
+  .spr-wrap label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;}
+  .spr-input{
+    width:100%;
+    font-size:20px;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    font-family:inherit;
+  }
+  .spr-input:focus{outline:none;border-color:var(--blue);}
+  .spr-hint{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5;}
+  .bottombar{
+    border-top:1px solid var(--line);
+    padding:14px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-shrink:0;
+    background:#fff;
+  }
+  .nav-btn{
+    padding:10px 26px;
+    border-radius:22px;
+    border:1.5px solid var(--navy);
+    background:#fff;
+    color:var(--navy);
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .nav-btn.solid{background:var(--navy);color:#fff;}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .navigator-open{
+    display:flex;align-items:center;gap:8px;
+    background:#fff;border:1.5px solid var(--line);
+    padding:9px 18px;border-radius:22px;cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:600;color:var(--text);
+  }
+  .navigator-open:hover{border-color:var(--blue);}
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(18,35,61,.5);
+    display:flex;align-items:center;justify-content:center;
+    z-index:50;padding:20px;
+  }
+  .modal{
+    background:#fff;border-radius:14px;max-width:560px;width:100%;
+    max-height:85vh;overflow-y:auto;padding:24px 26px;
+  }
+  .modal h2{margin:0 0 4px;font-size:19px;}
+  .modal .sub{color:var(--muted);font-size:13.5px;margin-bottom:18px;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px;font-size:12.5px;color:var(--muted);}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .navgrid{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;
+  }
+  .navcell{
+    position:relative;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:10px 6px;
+    text-align:center;
+    cursor:pointer;
+    font-weight:700;
+    font-size:14px;
+    background:#fff;
+  }
+  .navcell.answered{border-color:var(--blue);background:#eaf3fd;}
+  .navcell.current{outline:2.5px solid var(--navy);outline-offset:1px;}
+  .navcell .flagdot{
+    position:absolute;top:-6px;right:-6px;width:16px;height:16px;
+    background:var(--amber);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  }
+  .navcell .flagdot svg{width:9px;height:9px;fill:#fff;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+  .text-btn{background:none;border:none;color:var(--blue);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;}
+  .review{padding:30px 28px;max-width:820px;margin:0 auto;width:100%;}
+  .review h1{font-size:22px;margin-bottom:6px;}
+  .review p.sub{color:var(--muted);margin-top:0;margin-bottom:22px;font-size:14.5px;}
+  .review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:26px;}
+  .rcell{
+    border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;background:#fff;
+  }
+  .rcell:hover{border-color:var(--blue);}
+  .rcell .rn{font-weight:800;font-size:14px;}
+  .rcell .rs{font-size:12.5px;margin-top:4px;color:var(--muted);}
+  .rcell.answered .rs{color:var(--green);}
+  .rcell.unanswered .rs{color:var(--red);}
+  .rcell.flagged{border-color:var(--amber);}
+  .results{padding:34px 28px 60px;max-width:820px;margin:0 auto;width:100%;}
+  .score-hero{
+    text-align:center;background:var(--navy);color:#fff;border-radius:16px;
+    padding:34px 20px;margin-bottom:30px;
+  }
+  .score-hero .big{font-size:46px;font-weight:800;}
+  .score-hero .sub{color:#cfd8e6;font-size:14.5px;margin-top:6px;}
+  .score-bars{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+  .score-bars .pill{background:rgba(255,255,255,.12);padding:8px 16px;border-radius:20px;font-size:13px;}
+  .rq{border:1.5px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:16px;}
+  .rq-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .rq-head .tag{
+    font-size:12px;font-weight:800;padding:4px 12px;border-radius:14px;text-transform:uppercase;letter-spacing:.4px;
+  }
+  .tag.correct{background:#e4f5ec;color:var(--green);}
+  .tag.incorrect{background:#fbe9e7;color:var(--red);}
+  .tag.skipped{background:#f1f1f1;color:var(--muted);}
+  .rq .prompt{font-size:15.5px;margin-bottom:14px;}
+  .rq .yourans, .rq .correctans{font-size:14px;margin-bottom:4px;}
+  .rq .explain{
+    margin-top:12px;background:var(--bg);border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.6;
+  }
+  .restart-row{text-align:center;margin-top:30px;}
+  .calc-panel{
+    position:fixed;
+    top:90px;left:60px;
+    width:420px;
+    height:460px;
+    min-width:300px;
+    min-height:260px;
+    max-width:92vw;
+    max-height:80vh;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 10px 40px rgba(18,35,61,.35);
+    border:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    resize:both;
+    z-index:60;
+  }
+  .calc-header{
+    background:var(--navy);
+    color:#fff;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:move;
+    user-select:none;
+    flex-shrink:0;
+  }
+  .calc-header .title{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;}
+  .calc-header .close-x{
+    background:transparent;border:none;color:#fff;font-size:18px;line-height:1;
+    cursor:pointer;padding:2px 6px;border-radius:4px;
+  }
+  .calc-header .close-x:hover{background:rgba(255,255,255,.15);}
+  .calc-body{flex:1;min-height:0;}
+  .calc-body iframe, .calc-body .dcg-container{width:100%;height:100%;border:none;}
+  .calc-loading{
+    height:100%;display:flex;align-items:center;justify-content:center;
+    color:var(--muted);font-size:13.5px;text-align:center;padding:20px;
+  }
+  @media (max-width:640px){
+    .qbody{padding:22px 16px;}
+    .qmeta,.bottombar{padding:12px 16px;}
+    .navgrid{grid-template-columns:repeat(4,1fr);}
+    .prompt{font-size:16.5px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>Math Practice</div>
+    <div class="timer-wrap">
+      <button class="icon-btn" id="calcBtn" style="display:none;">Calculator</button>
+      <button class="icon-btn" id="navOpenBtn" style="display:none;">Question&nbsp;Navigator</button>
+      <div class="timer" id="timerDisplay" title="Click to hide/show timer">30:00</div>
+    </div>
+  </div>
+  <div class="progressbar"><div id="progressFill" style="width:0%;"></div></div>
+
+  <!-- START SCREEN -->
+  <div class="screen" id="screen-start">
+    <div class="start">
+      <h1>Linear Equations in One Variable</h1>
+      <p>25 questions covering solving and interpreting linear equations in one variable — modeled on the Digital SAT test interface. Select one answer per question, or type your answer for student-produced response items. You can flag questions and revisit them before submitting.</p>
+      <div class="meta">
+        <div class="meta-item"><div class="num">64</div><div class="lbl">Questions</div></div>
+        <div class="meta-item"><div class="num">75</div><div class="lbl">Minutes</div></div>
+        <div class="meta-item"><div class="num">46</div><div class="lbl">Multiple Choice</div></div>
+        <div class="meta-item"><div class="num">18</div><div class="lbl">Student-Produced</div></div>
+      </div>
+      <div class="options-row">
+        <label class="toggle-row"><input type="checkbox" id="timerToggle" checked> Show timer</label>
+      </div>
+      <button class="primary-btn" id="startBtn">Start Practice</button>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div class="screen hidden" id="screen-question">
+    <div class="qmeta">
+      <div class="qnum-chip">
+        <span class="badge" id="qNumBadge">1</span>
+        <span class="of">of 25 questions</span>
+      </div>
+      <button class="flag-btn" id="flagBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18M5 4h11l-2.5 4L16 12H5"/></svg>
+        <span id="flagLabel">Mark for Review</span>
+      </button>
+    </div>
+    <div class="qbody">
+      <div class="qcard">
+        <div class="topic" id="topicText"></div>
+        <div class="prompt" id="promptText"></div>
+        <div class="stimulus hidden" id="stimulusWrap"></div>
+        <div class="choices hidden" id="choicesWrap"></div>
+        <div class="spr-wrap hidden" id="sprWrap">
+          <label for="sprInput">Enter your answer</label>
+          <input class="spr-input" id="sprInput" type="text" placeholder="Answer" autocomplete="off">
+          <div class="spr-hint">You may enter a fraction (e.g. 43/5) or a decimal (e.g. 8.6).</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottombar">
+      <button class="nav-btn" id="backBtn">Back</button>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="navigator-open" id="navOpenBtnBottom">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Question <span id="navOpenLabel">1</span> of 25
+        </button>
+        <button class="nav-btn" id="reviewJumpBtn">Review Answers</button>
+      </div>
+      <button class="nav-btn solid" id="nextBtn">Next</button>
+    </div>
+  </div>
+
+  <!-- REVIEW SCREEN -->
+  <div class="screen hidden" id="screen-review">
+    <div class="review">
+      <h1>Check Your Work</h1>
+      <p class="sub">Review your answers below. Click any question to jump back to it. When you're ready, submit the practice set to see your results.</p>
+      <div class="review-grid" id="reviewGrid"></div>
+      <div style="display:flex;gap:12px;">
+        <button class="nav-btn" id="reviewBackBtn">Back to Questions</button>
+        <button class="nav-btn solid" id="submitBtn">Submit Practice Set</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="screen hidden" id="screen-results">
+    <div class="results" id="resultsWrap"></div>
+  </div>
+
+</div>
+
+<!-- NAVIGATOR MODAL -->
+<div class="modal-backdrop hidden" id="navModal">
+  <div class="modal">
+    <h2>Question Navigator</h2>
+    <div class="sub">Jump to any question. Flagged questions are marked for review.</div>
+    <div class="legend">
+      <span><span class="sw" style="background:#eaf3fd;border:1.5px solid var(--blue);"></span>Answered</span>
+      <span><span class="sw" style="background:#fff;border:1.5px solid var(--line);"></span>Unanswered</span>
+      <span><span class="sw" style="background:var(--amber);"></span>Flagged</span>
+    </div>
+    <div class="navgrid" id="navGrid"></div>
+    <div class="modal-actions">
+      <button class="text-btn" id="navCloseBtn">Close</button>
+      <button class="nav-btn solid" id="navGoReviewBtn">Go to Review Page</button>
+    </div>
+  </div>
+</div>
+
+<!-- CALCULATOR PANEL (Desmos) -->
+<div class="calc-panel hidden" id="calcPanel">
+  <div class="calc-header" id="calcHeader">
+    <span class="title">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/></svg>
+      Desmos Graphing Calculator
+    </span>
+    <button class="close-x" id="calcCloseBtn">&times;</button>
+  </div>
+  <div class="calc-body" id="calcBody">
+    <div class="calc-loading">Loading calculator&hellip;<br><span style="font-size:12px;">(requires an internet connection)</span></div>
+  </div>
+</div>
+
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+(function(){
+
+function frac(num, den){
+  return '<span class="frac"><span class="num">'+num+'</span><span class="den">'+den+'</span></span>';
+}
+
+const questions = [
+  {
+    id:'fa80893a', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'If 2x + 3 = 9, what is the value of 6x − 1?',
+    accept:['17'],
+    correctDisplay:'17',
+    explanation:'2x + 3 = 9, so 2x = 6 and x = 3. Then 6x − 1 = 18 − 1 = 17.'
+  },
+  {
+    id:'0adbe034', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 4x − 28 = −24, what is the value of x − 7?',
+    choices:[
+      {label:'A', html:'−24'},
+      {label:'B', html:'−22'},
+      {label:'C', html:'−6'},
+      {label:'D', html:'−1'}
+    ],
+    correct:'C',
+    explanation:'4x − 28 = −24, so 4x = 4 and x = 1. Then x − 7 = 1 − 7 = −6.'
+  },
+  {
+    id:'baca4a4c', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'Which equation has the same solution as the given equation?<br><br>7(2x − 3) = 63',
+    choices:[
+      {label:'A', html:'2x − 3 = 9'},
+      {label:'B', html:'2x − 3 = 56'},
+      {label:'C', html:'2x − 21 = 63'},
+      {label:'D', html:'2x − 21 = 70'}
+    ],
+    correct:'A',
+    explanation:'Dividing both sides of 7(2x − 3) = 63 by 7 gives 2x − 3 = 9, which has the same solution.'
+  },
+  {
+    id:'097e10f5', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'What value of p satisfies the equation 5p + 180 = 250?',
+    choices:[
+      {label:'A', html:'14'},
+      {label:'B', html:'65'},
+      {label:'C', html:'86'},
+      {label:'D', html:'250'}
+    ],
+    correct:'A',
+    explanation:'5p + 180 = 250, so 5p = 70, giving p = 14.'
+  },
+  {
+    id:'9b886541', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 4x − 9 = 15, what is the value of 4x + 3?',
+    choices:[
+      {label:'A', html:'3'},
+      {label:'B', html:'6'},
+      {label:'C', html:'18'},
+      {label:'D', html:'27'}
+    ],
+    correct:'D',
+    explanation:'4x − 9 = 15, so 4x = 24. Then 4x + 3 = 24 + 3 = 27.'
+  },
+  {
+    id:'465c73ad', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'What value of x is the solution to the given equation 10x = 86?',
+    accept:['8.6','43/5'],
+    correctDisplay:'8.6',
+    explanation:'Dividing both sides of 10x = 86 by 10 gives x = 8.6.'
+  },
+  {
+    id:'590f2187', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 3x − 27 = 24, what is the value of x − 9?',
+    choices:[
+      {label:'A', html:'1'},
+      {label:'B', html:'8'},
+      {label:'C', html:'24'},
+      {label:'D', html:'35'}
+    ],
+    correct:'B',
+    explanation:'3x − 27 = 24, so 3x = 51, giving x = 17. Then x − 9 = 17 − 9 = 8.'
+  },
+  {
+    id:'f2b63f49', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'What value of x is the solution to the given equation 8x − 7x + 130 = 260?',
+    accept:['130'],
+    correctDisplay:'130',
+    explanation:'8x − 7x + 130 = 260 simplifies to x + 130 = 260, so x = 130.'
+  },
+  {
+    id:'05417146', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'What value of w is the solution to the given equation w + 7 = 357?',
+    choices:[
+      {label:'A', html:'51'},
+      {label:'B', html:'350'},
+      {label:'C', html:'364'},
+      {label:'D', html:'3,577'}
+    ],
+    correct:'B',
+    explanation:'w + 7 = 357, so w = 350.'
+  },
+  {
+    id:'51aabd93', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'What value of p is the solution to the given equation (p + 3) + 8 = 10?',
+    choices:[
+      {label:'A', html:'−1'},
+      {label:'B', html:'5'},
+      {label:'C', html:'15'},
+      {label:'D', html:'21'}
+    ],
+    correct:'A',
+    explanation:'(p + 3) + 8 = 10, so p + 11 = 10, giving p = −1.'
+  },
+  {
+    id:'349a5bc1', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'What is the solution to the given equation 4x + 5 = 165?',
+    accept:['40'],
+    correctDisplay:'40',
+    explanation:'4x + 5 = 165, so 4x = 160, giving x = 40.'
+  },
+  {
+    id:'6105234d', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'John paid a total of $165 for a microscope by making a down payment of $37 plus p monthly payments of $16 each. Which of the following equations represents this situation?',
+    choices:[
+      {label:'A', html:'16p − 37 = 165'},
+      {label:'B', html:'37p − 16 = 165'},
+      {label:'C', html:'16p + 37 = 165'},
+      {label:'D', html:'37p + 16 = 165'}
+    ],
+    correct:'C',
+    explanation:'The total cost is the down payment plus the monthly payments: 37 + 16p = 165, which is the same as 16p + 37 = 165.'
+  },
+  {
+    id:'f305b5ca', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'Lorenzo purchased a box of cereal and some strawberries at the grocery store. Lorenzo paid $2 for the box of cereal and $1.90 per pound for the strawberries. If Lorenzo paid a total of $9.60 for the box of cereal and the strawberries, which of the following equations can be used to find p, the number of pounds of strawberries Lorenzo purchased? (Assume there is no sales tax.)',
+    choices:[
+      {label:'A', html:'1.90p + 2 = 9.60'},
+      {label:'B', html:'1.90p − 2 = 9.60'},
+      {label:'C', html:'1.90 + 2p = 9.60'},
+      {label:'D', html:'1.90 − 2p = 9.60'}
+    ],
+    correct:'A',
+    explanation:'The total cost is the fixed cereal cost plus the strawberry cost per pound times pounds purchased: 1.90p + 2 = 9.60.'
+  },
+  {
+    id:'5c94e6fa', type:'spr',
+    topic:'Linear equations: infinitely many solutions',
+    prompt:'In the equation 3x + 21 = 3x + k, k is a constant. The equation has infinitely many solutions. What is the value of k?',
+    accept:['21'],
+    correctDisplay:'21',
+    explanation:'For an equation of this form to have infinitely many solutions, both sides must be identical, so k must equal 21.'
+  },
+  {
+    id:'2f0a43b2', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'If x/8 = 5, what is the value of 8/x?',
+    accept:['0.2','1/5','.2'],
+    correctDisplay:'1/5',
+    explanation:'x/8 = 5, so x = 40. Then 8/x = 8/40 = 1/5 = 0.2.'
+  },
+  {
+    id:'997bec28', type:'spr',
+    topic:'Linear equations: word problem',
+    prompt:'The perimeter of an isosceles triangle is 83 inches. Each of the two congruent sides of the triangle has a length of 24 inches. What is the length, in inches, of the third side?',
+    accept:['35'],
+    correctDisplay:'35',
+    explanation:'The two congruent sides total 24 + 24 = 48 inches. The third side is 83 − 48 = 35 inches.'
+  },
+  {
+    id:'40ba6288', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 3x = 30, what is the value of 3x − 12?',
+    choices:[
+      {label:'A', html:'−2'},
+      {label:'B', html:'18'},
+      {label:'C', html:'22'},
+      {label:'D', html:'42'}
+    ],
+    correct:'B',
+    explanation:'3x = 30, so 3x − 12 = 30 − 12 = 18.'
+  },
+  {
+    id:'6ac23de7', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'In the equation \'+frac(4x,5)+\' = 20, what is the value of x?',
+    choices:[
+      {label:'A', html:'25'},
+      {label:'B', html:'24'},
+      {label:'C', html:'16'},
+      {label:'D', html:'15'}
+    ],
+    correct:'A',
+    explanation:'Multiplying both sides of 4x/5 = 20 by 5 gives 4x = 100, so x = 25.'
+  },
+  {
+    id:'7392dfc1', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'Which of the following is equivalent to 4x + 6 = 12?',
+    choices:[
+      {label:'A', html:'2x + 4 = 6'},
+      {label:'B', html:'x + 3 = 3'},
+      {label:'C', html:'3x + 2 = 4'},
+      {label:'D', html:'2x + 3 = 6'}
+    ],
+    correct:'D',
+    explanation:'Dividing every term of 4x + 6 = 12 by 2 gives 2x + 3 = 6, an equivalent equation.'
+  },
+  {
+    id:'93954cfa', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'One pound of grapes costs $2. At this rate, how many dollars will c pounds of grapes cost?',
+    choices:[
+      {label:'A', html:'2c'},
+      {label:'B', html:'2 + c'},
+      {label:'C', html:'2/c'},
+      {label:'D', html:'c/2'}
+    ],
+    correct:'A',
+    explanation:'At $2 per pound, c pounds costs 2 × c = 2c dollars.'
+  },
+  {
+    id:'3d04de9c', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'A principal used a total of 25 flags that were either blue or yellow for field day. The principal used 20 blue flags. How many yellow flags were used?',
+    choices:[
+      {label:'A', html:'5'},
+      {label:'B', html:'20'},
+      {label:'C', html:'25'},
+      {label:'D', html:'30'}
+    ],
+    correct:'A',
+    explanation:'Total flags minus blue flags gives yellow flags: 25 − 20 = 5.'
+  },
+  {
+    id:'60f71697', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'What value of x is the solution to the given equation 5x + 12 = −33?',
+    choices:[
+      {label:'A', html:'−45'},
+      {label:'B', html:'−9'},
+      {label:'C', html:'−4.2'},
+      {label:'D', html:'4.2'}
+    ],
+    correct:'B',
+    explanation:'5x + 12 = −33, so 5x = −45, giving x = −9.'
+  },
+  {
+    id:'4de87c9a', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'6 more than 8 times a number x is equal to 30. Which equation represents this situation?',
+    choices:[
+      {label:'A', html:'6x + 8 = 30'},
+      {label:'B', html:'8x + 6 = 30'},
+      {label:'C', html:'8(x + 6) = 30'},
+      {label:'D', html:'6(x + 8) = 30'}
+    ],
+    correct:'B',
+    explanation:'“8 times a number” is 8x, and “6 more than” that is 8x + 6, so the equation is 8x + 6 = 30.'
+  },
+  {
+    id:'12b04e68', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'A total of 300 people contributed to a charity event as either a donor or a volunteer. 210 people contributed as a donor. How many people contributed as a volunteer?',
+    choices:[
+      {label:'A', html:'90'},
+      {label:'B', html:'110'},
+      {label:'C', html:'190'},
+      {label:'D', html:'210'}
+    ],
+    correct:'A',
+    explanation:'Total contributors minus donors gives volunteers: 300 − 210 = 90.'
+  },
+  {
+    id:'e7b6f0d1', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'Which equation has the same solution as the given equation?<br><br>5(4x + 3) = 45',
+    choices:[
+      {label:'A', html:'4x + 3 = 9'},
+      {label:'B', html:'4x + 3 = 40'},
+      {label:'C', html:'4x + 15 = 9'},
+      {label:'D', html:'4x + 15 = 45'}
+    ],
+    correct:'A',
+    explanation:'Dividing both sides of 5(4x + 3) = 45 by 5 gives 4x + 3 = 9, which has the same solution.'
+  },
+  {
+    id:'8339793c', type:'spr',
+    topic:'Linear equations: word problem',
+    prompt:'Nasir bought 3 storage bins that were each the same price. He used a coupon for $10 off the entire purchase. The cost for the entire purchase after using the coupon was $20. What was the original price, in dollars, for 1 storage bin?',
+    accept:['10'],
+    correctDisplay:'10',
+    explanation:'If p is the price of one bin, 3p − 10 = 20, so 3p = 30, giving p = 10.'
+  },
+  {
+    id:'550b352c', type:'mcq',
+    topic:'Linear equations: number of solutions',
+    prompt:'10 = 2x + 4<br><br>How many solutions exist to the equation shown above?',
+    choices:[
+      {label:'A', html:'None'},
+      {label:'B', html:'Exactly 1'},
+      {label:'C', html:'Exactly 3'},
+      {label:'D', html:'Infinitely many'}
+    ],
+    correct:'B',
+    explanation:'This is a linear equation in one variable with different coefficients of x on each side (0 and 2), so it has exactly one solution.'
+  },
+  {
+    id:'87071893', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'What value of x is the solution to the given equation \'+frac(3,4)+\'x = 12?',
+    accept:['16'],
+    correctDisplay:'16',
+    explanation:'Multiplying both sides of (3/4)x = 12 by 4/3 gives x = 16.'
+  },
+  {
+    id:'79cf8505', type:'spr',
+    topic:'Linear equations: word problem',
+    prompt:'A line segment that has a length of 78 inches is divided into three parts. One part is 18 inches long. The other two parts have lengths that are equal to each other. What is the length, in inches, of one of the other two parts of equal length?',
+    accept:['30'],
+    correctDisplay:'30',
+    explanation:'The remaining length is 78 − 18 = 60 inches, split evenly: 60/2 = 30 inches.'
+  },
+  {
+    id:'b4553284', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'If 2x = 12, what is the value of 9x?',
+    accept:['54'],
+    correctDisplay:'54',
+    explanation:'2x = 12, so x = 6. Then 9x = 9 × 6 = 54.'
+  },
+  {
+    id:'ed18c4f7', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'Cathy has n CDs. Gerry has 3 more than twice the number of CDs that Cathy has. In terms of n, how many CDs does Gerry have?',
+    choices:[
+      {label:'A', html:'3n − 2'},
+      {label:'B', html:'3n + 2'},
+      {label:'C', html:'2n − 3'},
+      {label:'D', html:'2n + 3'}
+    ],
+    correct:'D',
+    explanation:'“Twice the number Cathy has” is 2n, and “3 more than” that is 2n + 3.'
+  },
+  {
+    id:'0d685865', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 5x + 3 = 18, what is the value of 10x + 6?',
+    choices:[
+      {label:'A', html:'15'},
+      {label:'B', html:'18'},
+      {label:'C', html:'30'},
+      {label:'D', html:'36'}
+    ],
+    correct:'D',
+    explanation:'10x + 6 is exactly double 5x + 3, so 10x + 6 = 2(18) = 36.'
+  },
+  {
+    id:'12255364', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'A gym charges its members a onetime $75 enrollment fee and a membership fee of $85 per month. If there are no charges other than the enrollment fee and the membership fee, after how many months will a member have been charged a total of $925 at the gym?',
+    choices:[
+      {label:'A', html:'10'},
+      {label:'B', html:'11'},
+      {label:'C', html:'12'},
+      {label:'D', html:'13'}
+    ],
+    correct:'A',
+    explanation:'75 + 85m = 925, so 85m = 850, giving m = 10 months.'
+  },
+  {
+    id:'b82a943c', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 7x = 28, what is the value of 8x?',
+    choices:[
+      {label:'A', html:'21'},
+      {label:'B', html:'32'},
+      {label:'C', html:'168'},
+      {label:'D', html:'224'}
+    ],
+    correct:'B',
+    explanation:'7x = 28, so x = 4. Then 8x = 8 × 4 = 32.'
+  },
+  {
+    id:'eac739b2', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 4x + 2 = 12, what is the value of 16x + 8?',
+    choices:[
+      {label:'A', html:'40'},
+      {label:'B', html:'48'},
+      {label:'C', html:'56'},
+      {label:'D', html:'60'}
+    ],
+    correct:'B',
+    explanation:'16x + 8 is 4 times (4x + 2), so 16x + 8 = 4(12) = 48.'
+  },
+  {
+    id:'2e98b1df', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'On the first day of a semester, a film club has 12 members. Each day after the first day of the semester, 3 new members join the film club. If no members leave the film club, how many total members will the film club have d days after the first day of the semester?',
+    choices:[
+      {label:'A', html:'12 + 3d'},
+      {label:'B', html:'12 + d/3'},
+      {label:'C', html:'3 + 12d'},
+      {label:'D', html:'3d'}
+    ],
+    correct:'A',
+    explanation:'The club starts with 12 members and gains 3 members per day, so after d days it has 12 + 3d members.'
+  },
+  {
+    id:'d9d83c02', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'For what value of w does w − 10 = 2(w + 5)?',
+    choices:[
+      {label:'A', html:'5'},
+      {label:'B', html:'0'},
+      {label:'C', html:'−15'},
+      {label:'D', html:'−20'}
+    ],
+    correct:'D',
+    explanation:'w − 10 = 2w + 10, so −20 = w.'
+  },
+  {
+    id:'da2e9202', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'16x + 30 = 190<br><br>Which equation has the same solution as the given equation?',
+    choices:[
+      {label:'A', html:'16x = 30'},
+      {label:'B', html:'16x = 130'},
+      {label:'C', html:'16x = 160'},
+      {label:'D', html:'16x = 190'}
+    ],
+    correct:'C',
+    explanation:'Subtracting 30 from both sides of 16x + 30 = 190 gives 16x = 160.'
+  },
+  {
+    id:'3c4ce699', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'If 6 + x = 9, what is the value of 18 + 3x?',
+    accept:['27'],
+    correctDisplay:'27',
+    explanation:'18 + 3x is 3 times (6 + x), so 18 + 3x = 3(9) = 27.'
+  },
+  {
+    id:'9fc31513', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'The perimeter of an isosceles triangle is 36 feet. Each of the two congruent sides of the triangle has a length of 10 feet. What is the length, in feet, of the third side?',
+    choices:[
+      {label:'A', html:'10'},
+      {label:'B', html:'12'},
+      {label:'C', html:'16'},
+      {label:'D', html:'18'}
+    ],
+    correct:'C',
+    explanation:'The two congruent sides total 10 + 10 = 20 feet. The third side is 36 − 20 = 16 feet.'
+  },
+  {
+    id:'2e8cc1c0', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 4x = 3, what is the value of 24x?',
+    choices:[
+      {label:'A', html:'\'+frac(9,2)+\''},
+      {label:'B', html:'6'},
+      {label:'C', html:'18'},
+      {label:'D', html:'72'}
+    ],
+    correct:'C',
+    explanation:'24x is 6 times 4x, so 24x = 6(3) = 18.'
+  },
+  {
+    id:'c7d7980e', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'What value of x is the solution to the given equation 13x = 112 − x?',
+    accept:['8'],
+    correctDisplay:'8',
+    explanation:'Adding x to both sides gives 14x = 112, so x = 8.'
+  },
+  {
+    id:'83fb222d', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'If 6n = 12, what is the value of n + 4?',
+    accept:['6'],
+    correctDisplay:'6',
+    explanation:'6n = 12, so n = 2. Then n + 4 = 2 + 4 = 6.'
+  },
+  {
+    id:'7a987ae4', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If \'+frac(2n,5)+\' = 10, what is the value of 2n − 1?',
+    choices:[
+      {label:'A', html:'24'},
+      {label:'B', html:'49'},
+      {label:'C', html:'50'},
+      {label:'D', html:'99'}
+    ],
+    correct:'B',
+    explanation:'Multiplying both sides of 2n/5 = 10 by 5 gives 2n = 50. Then 2n − 1 = 50 − 1 = 49.'
+  },
+  {
+    id:'56e1b09e', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'What value of x is the solution to the given equation 2.6 + x = 2.8?',
+    accept:['0.2','.2','1/5'],
+    correctDisplay:'0.2',
+    explanation:'2.6 + x = 2.8, so x = 2.8 − 2.6 = 0.2.'
+  },
+  {
+    id:'4f8bd093', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'What value of x is the solution to the equation 16x + 24 = 24x?',
+    choices:[
+      {label:'A', html:'\'+frac(−4,3)+\''},
+      {label:'B', html:'0'},
+      {label:'C', html:'\'+frac(1,3)+\''},
+      {label:'D', html:'3'}
+    ],
+    correct:'D',
+    explanation:'Subtracting 16x from both sides gives 24 = 8x, so x = 3.'
+  },
+  {
+    id:'9ff10b3b', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If \'+frac(1,2)+\'x − \'+frac(1,6)+\'x = 1, what is the value of x?',
+    choices:[
+      {label:'A', html:'−4'},
+      {label:'B', html:'\'+frac(1,3)+\''},
+      {label:'C', html:'3'},
+      {label:'D', html:'6'}
+    ],
+    correct:'C',
+    explanation:'(1/2)x − (1/6)x = (1/3)x, so (1/3)x = 1, giving x = 3.'
+  },
+  {
+    id:'59afe8db', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'3x + 5(x + 4) = 76<br><br>What value of x is the solution to the given equation?',
+    choices:[
+      {label:'A', html:'7'},
+      {label:'B', html:'8'},
+      {label:'C', html:'56'},
+      {label:'D', html:'72'}
+    ],
+    correct:'A',
+    explanation:'3x + 5x + 20 = 76, so 8x = 56, giving x = 7.'
+  },
+  {
+    id:'4e77195b', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'If 2 + x = 60, what is the value of 16 + 8x?',
+    accept:['480'],
+    correctDisplay:'480',
+    explanation:'16 + 8x is 8 times (2 + x), so 16 + 8x = 8(60) = 480.'
+  },
+  {
+    id:'5eb4918d', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 9x + 4 = 67, what is the value of 90x + 40?',
+    choices:[
+      {label:'A', html:'7'},
+      {label:'B', html:'70'},
+      {label:'C', html:'130'},
+      {label:'D', html:'670'}
+    ],
+    correct:'D',
+    explanation:'90x + 40 is 10 times (9x + 4), so 90x + 40 = 10(67) = 670.'
+  },
+  {
+    id:'d76ab4f5', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'4x + 1 = 33<br><br>Which equation has the same solution as the given equation?',
+    choices:[
+      {label:'A', html:'4x = 32'},
+      {label:'B', html:'4x = 5'},
+      {label:'C', html:'4x = 1'},
+      {label:'D', html:'4x = −32'}
+    ],
+    correct:'A',
+    explanation:'Subtracting 1 from both sides of 4x + 1 = 33 gives 4x = 32.'
+  },
+  {
+    id:'4f7981a0', type:'spr',
+    topic:'Linear equations in one variable',
+    prompt:'If 3x + 2 = 8, what is the value of 9x + 6?',
+    accept:['24'],
+    correctDisplay:'24',
+    explanation:'9x + 6 is 3 times (3x + 2), so 9x + 6 = 3(8) = 24.'
+  },
+  {
+    id:'c841e8e8', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'k + 12 = 336<br><br>What is the solution to the given equation?',
+    choices:[
+      {label:'A', html:'28'},
+      {label:'B', html:'324'},
+      {label:'C', html:'348'},
+      {label:'D', html:'4,032'}
+    ],
+    correct:'B',
+    explanation:'Subtracting 12 from both sides gives k = 336 − 12 = 324.'
+  },
+  {
+    id:'935f3403', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'For a restaurant owner to purchase a pizza oven at a total price of 13,000 dollars, a onetime down payment is required, and then fixed monthly payments are made for the remaining amount owed for the pizza oven. The equation 13,000 = 2,800 + 200t represents this situation, where t is the number of fixed monthly payments that are made. Which of the following is the best interpretation of 200 in this context?',
+    choices:[
+      {label:'A', html:'The amount, in dollars, of the down payment'},
+      {label:'B', html:'The amount, in dollars, of each fixed monthly payment'},
+      {label:'C', html:'The total amount, in dollars, paid for the pizza oven after t fixed monthly payments'},
+      {label:'D', html:'The total number of fixed monthly payments'}
+    ],
+    correct:'B',
+    explanation:'In the equation, 2,800 is the down payment and 200 is multiplied by the number of payments t, so 200 represents the dollar amount of each fixed monthly payment.'
+  },
+  {
+    id:'fbb0ea7f', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'A rocket contained 467,000 kilograms (kg) of propellant before launch. Exactly 21 seconds after launch, 362,105 kg of this propellant remained. On average, approximately how much propellant, in kg, did the rocket burn each second after launch?',
+    choices:[
+      {label:'A', html:'4,995'},
+      {label:'B', html:'17,243'},
+      {label:'C', html:'39,481'},
+      {label:'D', html:'104,895'}
+    ],
+    correct:'A',
+    explanation:'The propellant burned was 467,000 − 362,105 = 104,895 kg over 21 seconds, so the rate is 104,895/21 ≈ 4,995 kg per second.'
+  },
+  {
+    id:'c3989ef8', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'Henry receives a $60.00 gift card to pay for movies online. He uses his gift card to buy 3 movies for $7.50 each. If he spends the rest of his gift card balance on renting movies for $1.50 each, how many movies can Henry rent?',
+    choices:[
+      {label:'A', html:'10'},
+      {label:'B', html:'25'},
+      {label:'C', html:'35'},
+      {label:'D', html:'40'}
+    ],
+    correct:'B',
+    explanation:'After buying 3 movies, Henry has 60 − 3(7.50) = 60 − 22.50 = 37.50 left. At $1.50 per rental, he can rent 37.50/1.50 = 25 movies.'
+  },
+  {
+    id:'46f68129', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'A librarian has 43 books to distribute to a group of children. If he gives each child 2 books, he will have 7 books left over. How many children are in the group?',
+    choices:[
+      {label:'A', html:'15'},
+      {label:'B', html:'18'},
+      {label:'C', html:'25'},
+      {label:'D', html:'29'}
+    ],
+    correct:'B',
+    explanation:'The books actually given out are 43 − 7 = 36, and at 2 books per child that is 36/2 = 18 children.'
+  },
+  {
+    id:'56e373b3', type:'mcq',
+    topic:'Linear equations: word problem',
+    prompt:'A manager is responsible for ordering supplies for a shaved ice shop. The shop’s inventory starts with 4,500 paper cups, and the manager estimates that 70 of these paper cups are used each day. Based on this estimate, in how many days will the supply of paper cups reach 1,700?',
+    choices:[
+      {label:'A', html:'20'},
+      {label:'B', html:'40'},
+      {label:'C', html:'60'},
+      {label:'D', html:'80'}
+    ],
+    correct:'B',
+    explanation:'The number of cups used is 4,500 − 1,700 = 2,800. At 70 cups per day, that takes 2,800/70 = 40 days.'
+  },
+  {
+    id:'e53870b6', type:'spr',
+    topic:'Linear equations: infinitely many solutions',
+    prompt:'6x + k = 6x + 5<br><br>In the given equation, k is a constant. If the equation has infinitely many solutions, what is the value of k?',
+    accept:['5'],
+    correctDisplay:'5',
+    explanation:'For the equation to hold for all x, both sides must be identical, so k must equal 5.'
+  },
+  {
+    id:'23758540', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'What value of p satisfies the equation 2p + 275 = 325?',
+    choices:[
+      {label:'A', html:'5'},
+      {label:'B', html:'25'},
+      {label:'C', html:'48'},
+      {label:'D', html:'300'}
+    ],
+    correct:'B',
+    explanation:'2p + 275 = 325, so 2p = 50, giving p = 25.'
+  },
+  {
+    id:'49cd76d5', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 8x = 6, what is the value of 72x?',
+    choices:[
+      {label:'A', html:'3'},
+      {label:'B', html:'15'},
+      {label:'C', html:'54'},
+      {label:'D', html:'57'}
+    ],
+    correct:'C',
+    explanation:'72x is 9 times 8x, so 72x = 9(6) = 54.'
+  },
+  {
+    id:'70774aa4', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If 5x = 20, what is the value of 15x?',
+    choices:[
+      {label:'A', html:'4'},
+      {label:'B', html:'12'},
+      {label:'C', html:'23'},
+      {label:'D', html:'60'}
+    ],
+    correct:'D',
+    explanation:'15x is 3 times 5x, so 15x = 3(20) = 60.'
+  },
+  {
+    id:'a9c04a21', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'What is the solution to the equation 2x + 3 = 7?',
+    choices:[
+      {label:'A', html:'1'},
+      {label:'B', html:'1.5'},
+      {label:'C', html:'2'},
+      {label:'D', html:'4'}
+    ],
+    correct:'C',
+    explanation:'2x + 3 = 7, so 2x = 4, giving x = 2.'
+  },
+  {
+    id:'6fa593f1', type:'mcq',
+    topic:'Linear equations in one variable',
+    prompt:'If x = 40, what is the value of x + 6?',
+    choices:[
+      {label:'A', html:'34'},
+      {label:'B', html:'40'},
+      {label:'C', html:'46'},
+      {label:'D', html:'64'}
+    ],
+    correct:'C',
+    explanation:'x + 6 = 40 + 6 = 46.'
+  }
+];
+
+const state = {
+  current: 0,
+  answers: {},
+  flagged: {},
+  started:false,
+  submitted:false,
+  timerSeconds: 75*60,
+  timerId:null,
+  timerVisible:true
+};
+
+const el = (id)=>document.getElementById(id);
+const screens = {
+  start: el('screen-start'),
+  question: el('screen-question'),
+  review: el('screen-review'),
+  results: el('screen-results')
+};
+
+function showScreen(name){
+  Object.values(screens).forEach(s=>s.classList.add('hidden'));
+  screens[name].classList.remove('hidden');
+}
+
+function formatTime(s){
+  const m = Math.floor(s/60);
+  const sec = s%60;
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+}
+function tickTimer(){
+  if(state.timerSeconds<=0){clearInterval(state.timerId);return;}
+  state.timerSeconds--;
+  updateTimerDisplay();
+}
+function updateTimerDisplay(){
+  el('timerDisplay').textContent = formatTime(state.timerSeconds);
+  el('timerDisplay').classList.toggle('hidden-time', !state.timerVisible);
+}
+el('timerDisplay').addEventListener('click', ()=>{
+  state.timerVisible = !state.timerVisible;
+  updateTimerDisplay();
+});
+
+el('startBtn').addEventListener('click', ()=>{
+  state.started = true;
+  if(!el('timerToggle').checked){
+    el('timerDisplay').style.display='none';
+  } else {
+    state.timerId = setInterval(tickTimer, 1000);
+  }
+  el('navOpenBtn').style.display='inline-block';
+  el('calcBtn').style.display='inline-block';
+  updateTimerDisplay();
+  showScreen('question');
+  renderQuestion();
+});
+el('navOpenBtn').addEventListener('click', openNavigator);
+el('navOpenBtnBottom').addEventListener('click', openNavigator);
+el('reviewJumpBtn').addEventListener('click', ()=>{
+  renderReview();
+  showScreen('review');
+});
+
+function renderQuestion(){
+  const q = questions[state.current];
+  el('qNumBadge').textContent = (state.current+1);
+  el('navOpenLabel').textContent = (state.current+1);
+  el('progressFill').style.width = (((state.current+1)/questions.length)*100)+'%';
+
+  el('topicText').textContent = q.topic;
+  el('promptText').innerHTML = q.prompt;
+
+  const stWrap = el('stimulusWrap');
+  stWrap.innerHTML='';
+  stWrap.classList.add('hidden');
+
+  const flagged = !!state.flagged[q.id];
+  el('flagBtn').classList.toggle('active', flagged);
+  el('flagLabel').textContent = flagged ? 'Marked for Review' : 'Mark for Review';
+
+  const choicesWrap = el('choicesWrap');
+  const sprWrap = el('sprWrap');
+
+  if(q.type==='mcq'){
+    sprWrap.classList.add('hidden');
+    choicesWrap.classList.remove('hidden');
+    choicesWrap.innerHTML='';
+    q.choices.forEach(c=>{
+      const div = document.createElement('div');
+      div.className='choice'+(state.answers[q.id]===c.label?' selected':'');
+      div.innerHTML = '<span class="letter">'+c.label+'</span><span class="ctext">'+c.html+'</span>';
+      div.addEventListener('click', ()=>{
+        state.answers[q.id]=c.label;
+        renderQuestion();
+      });
+      choicesWrap.appendChild(div);
+    });
+  } else {
+    choicesWrap.classList.add('hidden');
+    sprWrap.classList.remove('hidden');
+    const input = el('sprInput');
+    input.value = state.answers[q.id] || '';
+    input.oninput = ()=>{
+      if(input.value.trim()===''){ delete state.answers[q.id]; }
+      else { state.answers[q.id]=input.value.trim(); }
+    };
+  }
+
+  el('backBtn').disabled = state.current===0;
+  el('nextBtn').textContent = state.current===questions.length-1 ? 'Review' : 'Next';
+}
+
+el('flagBtn').addEventListener('click', ()=>{
+  const q = questions[state.current];
+  state.flagged[q.id] = !state.flagged[q.id];
+  renderQuestion();
+});
+
+el('backBtn').addEventListener('click', ()=>{
+  if(state.current>0){state.current--; renderQuestion();}
+});
+el('nextBtn').addEventListener('click', ()=>{
+  if(state.current<questions.length-1){
+    state.current++;
+    renderQuestion();
+  } else {
+    renderReview();
+    showScreen('review');
+  }
+});
+
+function openNavigator(){
+  const grid = el('navGrid');
+  grid.innerHTML='';
+  questions.forEach((q,i)=>{
+    const answered = state.answers[q.id]!==undefined;
+    const cell = document.createElement('div');
+    cell.className='navcell'+(answered?' answered':'')+(i===state.current?' current':'')+(state.flagged[q.id]?' flagged':'');
+    cell.innerHTML = (i+1) + (state.flagged[q.id] ? '<span class="flagdot"><svg viewBox="0 0 24 24"><path d="M5 3v18M5 4h11l-2.5 4L16 12H5" fill="none" stroke="white" stroke-width="3"/></svg></span>' : '');
+    cell.addEventListener('click', ()=>{
+      state.current=i;
+      closeNavigator();
+      showScreen('question');
+      renderQuestion();
+    });
+    grid.appendChild(cell);
+  });
+  el('navModal').classList.remove('hidden');
+}
+function closeNavigator(){ el('navModal').classList.add('hidden'); }
+el('navCloseBtn').addEventListener('click', closeNavigator);
+el('navModal').addEventListener('click', (e)=>{ if(e.target.id==='navModal') closeNavigator(); });
+el('navGoReviewBtn').addEventListener('click', ()=>{
+  closeNavigator();
+  renderReview();
+  showScreen('review');
+});
+
+function renderReview(){
+  const grid = el('reviewGrid');
+  grid.innerHTML='';
+  questions.forEach((q,i)=>{
+    const answered = state.answers[q.id]!==undefined;
+    const cell = document.createElement('div');
+    cell.className='rcell '+(answered?'answered':'unanswered')+(state.flagged[q.id]?' flagged':'');
+    cell.innerHTML = '<div class="rn">Question '+(i+1)+'</div><div class="rs">'+(answered?'Answered':'Unanswered')+(state.flagged[q.id]?' \u00b7 Flagged':'')+'</div>';
+    cell.addEventListener('click', ()=>{
+      state.current=i;
+      showScreen('question');
+      renderQuestion();
+    });
+    grid.appendChild(cell);
+  });
+}
+el('reviewBackBtn').addEventListener('click', ()=>{
+  showScreen('question');
+  renderQuestion();
+});
+el('submitBtn').addEventListener('click', submitTest);
+
+function normalizeSpr(str){
+  if(str===undefined || str===null) return null;
+  str = String(str).trim().replace(/\s+/g,'');
+  if(str==='') return null;
+  if(str.indexOf('/')!==-1){
+    const parts = str.split('/');
+    if(parts.length===2){
+      const n=parseFloat(parts[0]), d=parseFloat(parts[1]);
+      if(!isNaN(n) && !isNaN(d) && d!==0) return n/d;
+    }
+    return NaN;
+  }
+  const v = parseFloat(str);
+  return isNaN(v) ? NaN : v;
+}
+function isCorrect(q){
+  const given = state.answers[q.id];
+  if(given===undefined) return false;
+  if(q.type==='mcq') return given===q.correct;
+  const givenNum = normalizeSpr(given);
+  if(givenNum===null || isNaN(givenNum)) return false;
+  return q.accept.some(a=>{
+    const target = normalizeSpr(a);
+    return !isNaN(target) && Math.abs(givenNum-target) < 0.01;
+  });
+}
+
+function submitTest(){
+  clearInterval(state.timerId);
+  state.submitted=true;
+  let correctCount=0;
+  questions.forEach(q=>{ if(isCorrect(q)) correctCount++; });
+
+  const wrap = el('resultsWrap');
+  const pct = Math.round((correctCount/questions.length)*100);
+
+  let html = '<div class="score-hero">'+
+    '<div class="big">'+correctCount+' / '+questions.length+'</div>'+
+    '<div class="sub">You answered '+pct+'% of questions correctly</div>'+
+    '<div class="score-bars">'+
+      '<div class="pill">'+Object.keys(state.answers).length+' answered</div>'+
+      '<div class="pill">'+(questions.length-Object.keys(state.answers).length)+' skipped</div>'+
+      '<div class="pill">'+Object.values(state.flagged).filter(Boolean).length+' flagged</div>'+
+    '</div></div>';
+
+  questions.forEach((q,i)=>{
+    const given = state.answers[q.id];
+    const correct = isCorrect(q);
+    const tag = given===undefined ? 'skipped' : (correct?'correct':'incorrect');
+    const tagLabel = given===undefined ? 'Skipped' : (correct?'Correct':'Incorrect');
+
+    let yourAnsText, correctAnsText;
+    if(q.type==='mcq'){
+      const chosen = q.choices.find(c=>c.label===given);
+      yourAnsText = chosen ? (given+'. '+stripTags(chosen.html)) : '\u2014';
+      const rightC = q.choices.find(c=>c.label===q.correct);
+      correctAnsText = q.correct+'. '+stripTags(rightC.html);
+    } else {
+      yourAnsText = given!==undefined ? given : '\u2014';
+      correctAnsText = q.correctDisplay;
+    }
+
+    html += '<div class="rq">'+
+      '<div class="rq-head"><strong>Question '+(i+1)+'</strong><span class="tag '+tag+'">'+tagLabel+'</span></div>'+
+      '<div class="prompt">'+q.prompt+'</div>'+
+      '<div class="yourans"><strong>Your answer:</strong> '+yourAnsText+'</div>'+
+      '<div class="correctans"><strong>Correct answer:</strong> '+correctAnsText+'</div>'+
+      '<div class="explain">'+q.explanation+'</div>'+
+      '</div>';
+  });
+
+  html += '<div class="restart-row"><button class="primary-btn" id="restartBtn">Start Over</button></div>';
+
+  wrap.innerHTML = html;
+  el('restartBtn').addEventListener('click', ()=>window.location.reload());
+
+  el('navOpenBtn').style.display='none';
+  el('calcBtn').style.display='none';
+  el('calcPanel').classList.add('hidden');
+  showScreen('results');
+  el('progressFill').style.width='100%';
+}
+
+function stripTags(html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+let desmosCalc = null;
+function initDesmosIfNeeded(){
+  if(desmosCalc) return;
+  const body = el('calcBody');
+  try{
+    if(typeof Desmos === 'undefined'){
+      body.innerHTML = '<div class="calc-loading">Couldn\'t load the Desmos calculator.<br>Check your internet connection and try again.</div>';
+      return;
+    }
+    body.innerHTML='';
+    desmosCalc = Desmos.GraphingCalculator(body, {
+      keypad:true,
+      expressionsCollapsed:false,
+      settingsMenu:true,
+      zoomButtons:true,
+      border:false
+    });
+  } catch(e){
+    body.innerHTML = '<div class="calc-loading">Couldn\'t load the Desmos calculator.<br>Check your internet connection and try again.</div>';
+  }
+}
+function openCalculator(){
+  el('calcPanel').classList.remove('hidden');
+  initDesmosIfNeeded();
+  if(desmosCalc){ setTimeout(()=>desmosCalc.resize(), 50); }
+}
+function closeCalculator(){ el('calcPanel').classList.add('hidden'); }
+el('calcBtn').addEventListener('click', openCalculator);
+el('calcCloseBtn').addEventListener('click', closeCalculator);
+
+(function makeDraggable(){
+  const panel = el('calcPanel');
+  const handle = el('calcHeader');
+  let dragging=false, offX=0, offY=0;
+  handle.addEventListener('mousedown', (e)=>{
+    if(e.target.id==='calcCloseBtn') return;
+    dragging=true;
+    const rect = panel.getBoundingClientRect();
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
+    panel.style.left = rect.left+'px';
+    panel.style.top = rect.top+'px';
+    document.body.style.userSelect='none';
+  });
+  window.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    let x = e.clientX - offX;
+    let y = e.clientY - offY;
+    x = Math.max(4, Math.min(window.innerWidth - 80, x));
+    y = Math.max(4, Math.min(window.innerHeight - 60, y));
+    panel.style.left = x+'px';
+    panel.style.top = y+'px';
+  });
+  window.addEventListener('mouseup', ()=>{
+    dragging=false;
+    document.body.style.userSelect='';
+    if(desmosCalc) desmosCalc.resize();
+  });
+  const ro = new ResizeObserver(()=>{ if(desmosCalc) desmosCalc.resize(); });
+  ro.observe(panel);
+})();
+
+updateTimerDisplay();
+
+})();
+</script>
+</body>
+</html>
